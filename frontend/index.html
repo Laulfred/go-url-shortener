@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortener</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 { text-align: center; }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 16px;
+    }
+    button {
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1565c0;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
+    }
+  </style>
+</head>
+<body>
+  <h1>URL Shortener</h1>
+  
+  <input id="longUrl" type="text" placeholder="Enter Long URL" />
+  <button onclick="shortenUrl()">Shorten</button>
+
+  <div id="result" class="result" style="display:none;"></div>
+
+  <script>
+    async function shortenUrl() {
+      const longUrl = document.getElementById("longUrl").value;
+      const userId = crypto.randomUUID();
+
+      const res = await fetch("http://localhost:9808/create-short-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ long_url: longUrl, user_id: userId }),
+      });
+
+      const data = await res.json();
+
+      const resultDiv = document.getElementById("result");
+      if (data.short_url) {
+        const shortLink = `${data.short_url}`;
+        resultDiv.innerHTML = `Short URL: <a href="${shortLink}" target="_blank">${shortLink}</a>`;
+      } else {
+        resultDiv.innerHTML = `Error: ${data.error || "Could not shorten URL"}`;
+      }
+      resultDiv.style.display = "block";
+    }
+  </script>
+</body>
+</html>
